@@ -1,0 +1,92 @@
+import express from "express";
+import {query, validationResult, body, matchedData,checkSchema} from "express-validator";
+import { createUserValidationSchema,createQueryValidationSchema } from "./utils/validationSchema.mjs";
+
+const app=express();
+app.use(express.json())
+const PORT=process.env.PORT || 4000;
+
+const mockUsers=[
+    {id:1, username: "anson", displayName:"Anson"},
+    {id:2, username: "jack", displayName:"Jack"},
+    {id:3, username: "adam", displayName:"Adam"},
+    {id:4, username: "tina", displayName:"Tina"},
+    {id:5, username: "jason", displayName:"Jason"},
+    {id:6, username: "henry", displayName:"Henry"},
+    {id:7, username: "marilyn", displayName:"Marilyn"},
+];
+app.listen(PORT,()=>{
+    console.log(`Running on port ${PORT}`);
+});
+//middleware defination...
+{
+    //Defining global middleware func
+    const loggingmiddleWare=(request,response,next)=>{
+        console.log(`${request.method} - ${request.url}`);
+        next();
+    }
+    app.use(loggingmiddleWare);
+    //Defining another NON-GLOBAL Middleware function
+    const resolveIndexById=(request,response,next)=>{
+        const {params:{id}}=request;
+            const parseId=parseInt(id);
+            if(isNaN(parseId))  return response.sendStatus(400);
+            const findUserIndex=mockUsers.findIndex((user)=> user.id===parseId);
+            console.log(findUserIndex);
+            if(findUserIndex===-1)    return response.sendStatus(404);
+            request.findUserIndex=findUserIndex;//a new property to request object is assingned here in middleware function. it defines the index in the mockUser array in our case.
+            next();//this then calls the final requestHandler which is also a middleware which performs the task assigned in that route(or sends the response). 
+    }
+
+    //USING MIDDLEWARE IN GET:
+    app.get('/api/users/:id',resolveIndexById,(request,response)=>{
+        const {findUserIndex} = request;
+        const findUser=mockUsers[findUserIndex];
+        if(!findUser) return response.sendStatus(404);
+        return response.send(findUser).status(201);
+    });
+}
+
+
+//              POST        schema
+app.post('/api/users',checkSchema(createUserValidationSchema),(request,response)=>
+{
+const result=validationResult(request);
+console.log(result);
+console.log("POST "+result.isEmpty());
+if(!result.isEmpty()){        
+    return response.status(400).send({errors: [result.array()[1].msg, result.array()[3].msg]});
+} 
+const data = matchedData(request); 
+const newUser= { id: mockUsers[mockUsers.length-1].id+1, ...data};
+mockUsers.push(newUser);
+return response.status(201).send(newUser);
+});
+
+        //                  GET   schema
+app.get('/api/users',checkSchema(
+createQueryValidationSchema),(request,response)=>{
+    const result = validationResult(request);
+    console.log(result);
+
+    //when the client has defined both values for value and filter, only thn filter will be applied.
+    if(result.isEmpty()){    
+        const {query: {filter,value}} = request;        //destructuring assignment to extract property query within the request object 
+        
+            // request object has a property called query, which is an another object containing properties filter and value
+        const data=mockUsers.filter((user)=>user[filter].includes(value))//storing filtered values in 'data'.
+        console.log(typeof(data));
+        //if nothing is present in data
+        if(Object.keys(data).length === 0){
+            let msg="filter not found in username";         
+            return response.send({msg,mockUsers});//sending complete array due to incorrect filter request.
+        }
+        return response.send(mockUsers.filter((user)=>user[filter].includes(value)));//sending filterd response
+    }
+    return response.send(mockUsers);//when the client hasn't defined any values for value or filter complete object will be sent.    
+});
+
+
+
+
+
