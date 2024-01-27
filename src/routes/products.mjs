@@ -5,13 +5,20 @@ router.use(loggingmiddleWare);
 import { products } from "../utils/constants.mjs";
 
 router.get('/api/products',(request,response)=>{
-    response.send([
-        {id:1, name: "Bottle", price:20},
-        {id:2, name: "keyboard", price:550},
-        {id: 3, name: "table", price: 890}
-    ]);
-});
 
+    // console.log(request.headers.cookie);   //cookies replaced by signedcookies
+    // console.log(request.cookies);
+    console.log(request.signedCookies);
+    console.log(request.signedCookies.hello);
+    if(request.signedCookies.hello && request.signedCookies.hello === 'world') //now client first must visit to /api route to get cookie permission and cookie age expire after every 10 seconds .
+        return  response.send([
+                {id:1, name: "Bottle", price:20},
+                {id:2, name: "keyboard", price:550},
+                {id: 3, name: "table", price: 890}
+            ]);
+    return response.status(403).send({msg:"You need to send correct cookie."});
+});
+    
 //here id will work as key it will only give the details of that particular id enterd by client
 //this method is benefial to validate request.
 router.get('/api/products/:id',(request ,response)=> {
