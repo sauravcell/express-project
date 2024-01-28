@@ -8,8 +8,12 @@ router.get('/api/products',(request,response)=>{
 
     // console.log(request.headers.cookie);   //cookies replaced by signedcookies
     // console.log(request.cookies);
+    console.log("product console: printing_START");
+    console.log(request.session);
+    console.log(request.session.id);
     console.log(request.signedCookies);
     console.log(request.signedCookies.hello);
+    console.log("product console:END");
     if(request.signedCookies.hello && request.signedCookies.hello === 'world') //now client first must visit to /api route to get cookie permission and cookie age expire after every 10 seconds .
         return  response.send([
                 {id:1, name: "Bottle", price:20},

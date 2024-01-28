@@ -1,11 +1,11 @@
 const mockUsers=[
-    {id:1, username: "anson", displayName:"Anson"},
-    {id:2, username: "jack", displayName:"Jack"},
-    {id:3, username: "adam", displayName:"Adam"},
-    {id:4, username: "tina", displayName:"Tina"},
-    {id:5, username: "jason", displayName:"Jason"},
-    {id:6, username: "henry", displayName:"Henry"},
-    {id:7, username: "marilyn", displayName:"Marilyn"},
+    {id:1, username: "anson", displayName:"Anson", password:"hello01"},
+    {id:2, username: "jack", displayName:"Jack", password:"hello02"},
+    {id:3, username: "adam", displayName:"Adam", password:"hello03"},
+    {id:4, username: "tina", displayName:"Tina", password:"hello04"},
+    {id:5, username: "jason", displayName:"Jason", password:"hello05"},
+    {id:6, username: "henry", displayName:"Henry", password:"hello06"},
+    {id:7, username: "marilyn", displayName:"Marilyn", password:"hello07"},
 ];
 
 const products=[
