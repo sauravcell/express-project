@@ -4,6 +4,7 @@ import { validationResult,matchedData,checkSchema,query } from "express-validato
 import { createUserValidationSchema, createQueryValidationSchema } from "../utils/validationSchema.mjs";
 import {mockUsers} from "../utils/constants.mjs";
 import { loggingmiddleWare, resolveIndexById } from "../utils/middleware.mjs";
+import { User } from "../mongoose/schemas/user.mjs";
 router.use(loggingmiddleWare);//only the routes declared after this line will be affected by the global middleware 'loggingmiddleWare'.
 
 //now route setup GET method...It sets the response to be send  for a specific path in the URL request
@@ -43,21 +44,24 @@ router.use(loggingmiddleWare);//only the routes declared after this line will be
 
 //Now POST http request method....it is used to accept a data sent from client. Eg- Form submission. The data is send via request body or payload. Then necessary operation on it is done. The .json() method is used to parse the request body which is imported earlier.
 {       //POST schema
-    router.post('/api/users',checkSchema(createUserValidationSchema),(request,response)=>
-   {
-    const result=validationResult(request);
-    console.log(result);
-    console.log("POST "+result.isEmpty());
-    if(!result.isEmpty() ){   
-        return response.status(400).send({errors: [result.array()]});
-        //    return response.status(400).send({errors: [result.array()[1].msg,result.array()[0].msg]});    <---To send specific error message!
-    } //returning the error array to the client-side
-    const data = matchedData(request);
-
-    const newUser= { id: mockUsers[mockUsers.length-1].id+1, ...data};//This line creates a new user object (newUser) by assigning a unique id to it.The ...data syntax is used to spread the properties of the data object into the newUser object.
-    mockUsers.push(newUser);//This line adds newUser array. 
-    return response.status(201).send(newUser);//201 means new record created.
-   });
+    router.post('/api/users',checkSchema(createUserValidationSchema),async(request,response)=> //modified code to save data to DB
+    {
+        const result = validationResult(request);
+        if(!result.isEmpty()) 
+            return response.status(400).send(result.array());
+        const data = matchedData(request);
+        console.log(data);
+        const newUser = new User(data);
+        try {
+            const SavedUser=await newUser.save();
+            return response.status(201).send(SavedUser);
+        } 
+        catch (error) {
+            console.log(error);
+            return response.status(400).send('DB operation not successfull');
+            
+        }
+    });
 }
 
 //Now PUT http request method....used to update data in DB entire record/row is updated.

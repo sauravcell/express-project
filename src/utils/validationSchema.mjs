@@ -2,10 +2,10 @@ const createUserValidationSchema={
     username:{
         isLength:{
             options:{
-                min:5,
+                min:3,
                 max:32
             },
-            errorMessage:"username must have atleast 5 to 32 characters."
+            errorMessage:"username must have atleast 3 to 32 characters."
         },
         notEmpty: {
             errorMessage:"Username Empty"
@@ -20,11 +20,13 @@ const createUserValidationSchema={
         },
         isLength:{
             options:{
-                min:4,
+                min:3,
                 max:8
             },
-            errorMessage:"Displayname size should be between 4 to 8 characters."
+            errorMessage:"Displayname size should be between 3 to 8 characters."
         }
+    },password:{
+        notEmpty: true
     }
 };
 
