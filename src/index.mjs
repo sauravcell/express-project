@@ -6,6 +6,8 @@ import { mockUsers } from "./utils/constants.mjs";
 import passport from "passport";
 import "./strategies/local-strategy.mjs"
 import mongoose from "mongoose";
+import MongoStore from "connect-mongo";
+
 const PORT=process.env.PORT || 4000;
 const app=express();
 
@@ -24,6 +26,9 @@ app.use(session({   //allows to handle client session
     cookie:{
         maxAge: 60000*60       //default cookie time set inside session
     },
+    store: MongoStore.create({      //this enebles to store the session data in DB instead of inmemory earlier. so evn if server goes down session data can be retrived from DB. 
+        client: mongoose.connection.getClient(),
+    }),
 })); 
 app.use(passport.initialize()); //passport needs declaration between session and route declartion
 app.use(passport.session());
@@ -50,8 +55,10 @@ passport.authenticate("local"),
 //next this to check authentication status
 app.get('/api/auth/status',(request,response)=>{
     console.log(`inside /api/auth/status:`);
+    console.log("inside status:")
     console.log(request.user);
     console.log(request.session);
+    console.log(request.sessionID);
     return request.user ? response.send(request.user) :response.sendStatus(401);    
 });
 

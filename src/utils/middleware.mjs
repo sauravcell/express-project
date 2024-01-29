@@ -8,7 +8,7 @@ const loggingmiddleWare=(request,response,next)=>{
 
 //Defining another NON-GLOBAL Middleware function
 const resolveIndexById=(request,response,next)=>{    //works only on users object
-    const {params:{id}}=request;
+        const {params:{id}}=request;
         const parseId=parseInt(id);
         if(isNaN(parseId))  return response.sendStatus(400);
         const findUserIndex=mockUsers.findIndex((user)=> user.id===parseId);

@@ -13,9 +13,21 @@ router.use(loggingmiddleWare);//only the routes declared after this line will be
 //And Query parameters...It is passed in the URL which contains some values tht can be send by the client to filter output. It always starts with  '?' in URL. Eg- http://localhost:4000/app/users?filter=username&value=an
 {        //GET schema  
     router.get('/api/users',checkSchema(
-    createQueryValidationSchema),(request,response)=>{  
-    const result = validationResult(request);
-    console.log(result);
+    createQueryValidationSchema),(request,response)=>{
+//adding session store logic
+    console.log("Inside session store Get:id");
+    console.log(request.session.id);
+    request.sessionStore.get(request.session.id,(err,sessionData)=>{
+        if(err){
+            console.log(err);
+            throw err;
+        }
+        console.log("Inside session store Get:sessionData");
+        console.log(sessionData);
+    });
+
+    const result = validationResult(request);  
+    // console.log(result);
         
     //when the client has defined both values for value and filter, only thn filter will be applied.
     if(result.isEmpty()){    
