@@ -2,6 +2,7 @@
     import { Strategy } from "passport-local";
     import { mockUsers } from "../utils/constants.mjs";
     import { User } from "../mongoose/schemas/user.mjs";
+import { comparePassword } from "../utils/helpers.mjs";
     passport.serializeUser((user,done)=>{
         console.log(`in serialize user:`);
         console.log(user);
@@ -29,7 +30,8 @@ export default passport.use(        //updated: authentication logic using Databa
     try{
         const findUser=await User.findOne({username});  //checking usernme in DB
         if(!findUser) throw new Error("user not found");
-        if(findUser.password !== password) throw new Error("Bad credentials1.");    //validating password
+        if(!comparePassword(password, findUser.password))   //comparing client-side plain password with DB hashed password
+            throw new Error("Bad credentials.");    //new way to validate hashed password}
         done(null,findUser);
         }
     catch(err){

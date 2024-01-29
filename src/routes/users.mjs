@@ -4,6 +4,7 @@ import { validationResult,matchedData,checkSchema,query } from "express-validato
 import { createUserValidationSchema, createQueryValidationSchema } from "../utils/validationSchema.mjs";
 import {mockUsers} from "../utils/constants.mjs";
 import { loggingmiddleWare, resolveIndexById } from "../utils/middleware.mjs";
+import { hashPassword } from "../utils/helpers.mjs";
 import { User } from "../mongoose/schemas/user.mjs";
 router.use(loggingmiddleWare);//only the routes declared after this line will be affected by the global middleware 'loggingmiddleWare'.
 
@@ -50,7 +51,9 @@ router.use(loggingmiddleWare);//only the routes declared after this line will be
         if(!result.isEmpty()) 
             return response.status(400).send(result.array());
         const data = matchedData(request);
-        console.log(data);
+        console.log(data);      //before hashing
+        data.password = hashPassword(data.password); //Appling hashing in the user inputs for password
+        console.log(data);  //after hashing
         const newUser = new User(data);
         try {
             const SavedUser=await newUser.save();
