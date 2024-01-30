@@ -4,7 +4,8 @@ import cookieParser from "cookie-parser";
 import session from "express-session";
 import { mockUsers } from "./utils/constants.mjs";
 import passport from "passport";
-import "./strategies/local-strategy.mjs"
+// import "./strategies/local-strategy.mjs" //comented due to the use of discord passport strategy in place of local local passport strategy.
+import "./strategies/discord-strategy.mjs"
 import mongoose from "mongoose";
 import MongoStore from "connect-mongo";
 
@@ -55,7 +56,7 @@ passport.authenticate("local"),
 //next this to check authentication status
 app.get('/api/auth/status',(request,response)=>{
     console.log(`inside /api/auth/status:`);
-    console.log("inside status:")
+    console.log("inside status endpoint:")
     console.log(request.user);
     console.log(request.session);
     console.log(request.sessionID);
@@ -74,4 +75,26 @@ app.post('/api/auth/logout',(request,response)=>{
 
 
 
+//applying dicord logic
+app.get('/api/auth/discord',passport.authenticate('discord'));//calls discord via discord-strategy file
 
+app.get('/api/auth/discord/redirect',passport.authenticate('discord'),
+(request,response)=>{
+    console.log("Inside redirect:");
+    console.log(request.session);
+    console.log(request.user);
+    response.status(200).send('Discord authentication successful.');
+}
+)
+
+/*
+After authorization from discord, the discord a query parameter namele 'code' which the 'accessToken' & 'refreshToken' created by discord API after authorization. We use the redirect URL: 
+.get('/api/auth/discord/redirect') to grab that information from the code paremeter.  
+so the flow works as:
+    1: .get('/api/auth/discord'),then
+    2: passport.authenticate('discord'); it will redirect us to the 3rd party platform. 
+    3. Once we click on authorize, it generates the tokens and stores in 'code' query parameter. It will thn redirect us to callback URL:
+    .get('/api/auth/discord/redirect') .
+    4. In the redirect URL when the passport.authenticate('discord') is called again, then, the access Token & refresh Token are exchanged from the 'code' query parameter.
+    5. Then the verified function in discord strategy logic is called at end ,which uses those tokens.
+*/
