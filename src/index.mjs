@@ -2,10 +2,9 @@ import express, { request, response } from "express";
 import routes from "./routes/index.mjs";
 import cookieParser from "cookie-parser";
 import session from "express-session";
-import { mockUsers } from "./utils/constants.mjs";
 import passport from "passport";
-// import "./strategies/local-strategy.mjs" //comented due to the use of discord passport strategy in place of local local passport strategy.
-import "./strategies/discord-strategy.mjs"
+import "./strategies/local-strategy.mjs" //comented due to the use of discord passport strategy in place of local local passport strategy.
+// import "./strategies/discord-strategy.mjs"   //commented due to the use of local
 import mongoose from "mongoose";
 import MongoStore from "connect-mongo";
 
@@ -23,7 +22,7 @@ app.use(cookieParser('helloworld'));//must be done bfr app.use(routes), 'hellowo
 app.use(session({   //allows to handle client session
     secret:"blacknike",
     saveUninitialized:false,
-    reSave: false,
+    reSave:false,
     cookie:{
         maxAge: 60000*60       //default cookie time set inside session
     },
@@ -50,21 +49,22 @@ app.get("/",(request,response)=>{  // 3 different ways sending json response
 app.post('/api/auth',
 passport.authenticate("local"),
 (request,response)=>{
+    console.log(`inside auth route:`);
     response.sendStatus(200);
 });
 
 //next this to check authentication status
 app.get('/api/auth/status',(request,response)=>{
-    console.log(`inside /api/auth/status:`);
-    console.log("inside status endpoint:")
-    console.log(request.user);
-    console.log(request.session);
-    console.log(request.sessionID);
-    return request.user ? response.send(request.user) :response.sendStatus(401);    
+    console.log(`inside status route:`);
+    console.log({"req_user":request.user});
+    console.log({"req_session":request.session});
+    console.log({"req_session-id":request.sessionID});
+    return request.user ? response.send(request.user):response.sendStatus(401);    
 });
 
 //to terminate an existing login session
 app.post('/api/auth/logout',(request,response)=>{
+    console.log(`inside logout route:`);
     if(!request.user)
         return response.sendStatus(401);    //notauthenticated
     request.logout((err)=>{

@@ -8,6 +8,7 @@ const loggingmiddleWare=(request,response,next)=>{
 
 //Defining another NON-GLOBAL Middleware function
 const resolveIndexById=(request,response,next)=>{    //works only on users object
+        console.log(`inside resolveIndexById`);
         const {params:{id}}=request;
         const parseId=parseInt(id);
         if(isNaN(parseId))  return response.sendStatus(400);

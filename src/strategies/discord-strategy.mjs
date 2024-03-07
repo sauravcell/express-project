@@ -4,14 +4,14 @@ import { DiscordUser } from "../mongoose/schemas/discord-user.mjs";
  
 //serializer is called only for the first visit by a client. It takes the validated user details and store it in the session object in the form of string. Atlast it send the session id to client in a cookie for subsequent access to the site till the cookie is valid.
 passport.serializeUser((user,done)=>{
-    console.log(`in serialize user:`);
+    console.log(`in discord_serialize user:`);
     console.log(user);
     done(null,user.id); //pass uniquie field like id or username in 2nd field.
 }); 
 
 //deserializeUser takes back the session string from DB nd converts it back to json format, then attaches it to bck to request object. This enables us to identify who the user is nd get back his session data. It takes the help of the cookie sent by a visited client. 
 passport.deserializeUser(async(id, done)=>{        // username or id is used in argument bcz it is used in done() in serializeUser parameter above.  
-    console.log(`Inside deserializingUser`)
+    console.log(`Inside discord_deserializeUser`)
     console.log(`deserializing userid: ${id}`);
     try {
         const findUser=await DiscordUser.findById(id);
@@ -32,6 +32,7 @@ export default passport.use(
         },
         async (accessToken,refreshToken,profile,done)=>{  //() it is a verify callback function, tokens have a fixed validity expire time. There values are obtained from code query pamameter only after a succesfull authentication as explained in index.mjs file.
         //console.log(profile);
+        console.log(`inside discord logic`);
         let findUser ;
         try {
             findUser= await DiscordUser.findOne({discordId: profile.id});
