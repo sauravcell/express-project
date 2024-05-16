@@ -1,1 +1,2 @@
-This is the first my express code learned from youtube channel "Anson the develop" : 'Express JS_7.55 hrs series'.
+Techs used:
+oauth2, mongoose, session-management, multer, jest-tests, input-validator, passport strategy, jwt tokens, curd-operations, bcrypt-hashing
