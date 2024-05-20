@@ -9,7 +9,8 @@
     4. configure the automatically created "jest.config.mjs" after completing step 3.
         Here, the ' moduleFileExtensions[...]' array is modified by removing unnecessary extentions.
         Then, for transform map we set: {"^.+\\m?js$" : "babel-jest",}. It is obtained from JEST Code Transformation web page.
-    5. Finally,check the package.json file where the test value inside scripts will be "jest"   
+    5. Create jsconfig.json and configure the file as shown in that jsconfig.json file. Also , install another npm package : npm i -D @types/jest.
+    6. Finally,check the package.json file where the test value inside scripts will be "jest"   
 
 
         ____##### , Now we are set to go for testing , #####_________
